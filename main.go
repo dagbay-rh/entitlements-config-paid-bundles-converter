@@ -15,6 +15,7 @@ type Bundle struct {
 	UseValidOrgId  	bool     	`yaml:"use_valid_org_id,omitempty"`
 	UseIsInternal  	bool     	`yaml:"use_is_internal,omitempty"`
 	Skus           	[]string 	`yaml:"skus,omitempty"`
+	EvalSkus		[]string	`yaml:"eval_skus,omitempty"`
 	PaidSkus		[]string 	`yaml:"paid_skus,omitempty"`
 }
 
@@ -64,6 +65,12 @@ func removePaidSkusFromSkus(bundles []Bundle) []Bundle {
 	newBundles := make([]Bundle, len(bundles))
 
 	for i, bundle := range bundles {
+		// if no paid skus configured, leave as is
+		if len(bundle.PaidSkus) == 0 {
+			newBundles[i] = bundle
+			continue
+		}
+
 		// Create a map of paid SKUs for quick lookup
 		paidSkusMap := make(map[string]bool)
 		for _, paidSku := range bundle.PaidSkus {
@@ -84,7 +91,7 @@ func removePaidSkusFromSkus(bundles []Bundle) []Bundle {
 			UseValidAccNum: bundle.UseValidAccNum,
 			UseValidOrgId:  bundle.UseValidOrgId,
 			UseIsInternal:  bundle.UseIsInternal,
-			Skus:           filteredSkus,
+			EvalSkus:		filteredSkus,
 			PaidSkus:       bundle.PaidSkus,
 		}
 	}
